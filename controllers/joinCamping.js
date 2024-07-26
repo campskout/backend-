@@ -124,7 +124,6 @@ const fetchOnePostJoin = async (req, res) => {
     }
 };
 
-
 module.exports = {
     fetchJoinPosts,
     createJoinPostCamping,

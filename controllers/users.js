@@ -4,7 +4,8 @@ const prisma = require('../database/prisma.js')
 const fetchUsers = async (req, res) => {
     const users = await prisma.user.findMany({
         include: {
-            posts: true
+            posts: true,
+            joinCampingPosts:true
         },
         
         orderBy: {

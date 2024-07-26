@@ -8,6 +8,6 @@ const {fetchJoinPosts,createJoinPostCamping,cancelJoinPostCamping,fetchOnePostJo
 router.get('/get',fetchJoinPosts)
 router.post('/add',createJoinPostCamping)
 router.post('/cancel',cancelJoinPostCamping)
-router.get('/:userId/:postId', fetchOnePostJoin);
+router.get('/:userId/:postId', fetchOnePostJoin)
 
 module.exports = router;
