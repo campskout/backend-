@@ -5,7 +5,12 @@ const fetchCampings = async (req, res) => {
     const campings = await prisma.campingPost.findMany({
         include: {
          user:true,
-         joinCampingPosts:true  
+         joinCampingPosts: {
+            include: {
+                post: true, // To include the associated CampingPost
+                user:true
+            }
+        }, 
         },
         orderBy: {
             id: "desc",
@@ -56,7 +61,8 @@ const campingPostDetails = async (req, res) => {
                 user: true,
                 joinCampingPosts: {
                     include: {
-                        user: true // Optionally include user details in joinCampingPosts
+                        user: true, // Optionally include user details in joinCampingPosts
+                        post:true
                     }
                 }
             }
