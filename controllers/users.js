@@ -4,8 +4,9 @@ const prisma = require('../database/prisma.js')
 const fetchUsers = async (req, res) => {
     const users = await prisma.user.findMany({
         include: {
-            post: true
+            posts: true
         },
+        
         orderBy: {
             id: "desc",
         },
