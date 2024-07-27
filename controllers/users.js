@@ -3,6 +3,7 @@ const prisma = require('../database/prisma.js');
 const fetchUsers = async (req, res) => {
     try {
         const users = await prisma.user.findMany({
+            
             include: {
                 posts: true,
                 joinCampingPosts: {
