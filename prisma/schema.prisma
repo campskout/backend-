@@ -24,35 +24,49 @@ model User {
   password      String
   name          String
   address       String
-  interests    String[]       @default(["Hiking", "Kayaking", "Fishing","Climbing","Hiking","Others"])
-  imagesProfile String[] 
+  interests    String[] @default(["Hiking", "Kayaking", "Fishing","Climbing","Hiking","Others"])
+  imagesProfile String[]
   gender        Gender
   bio           String
   phoneNumber   String
-  dateOfBirth   DateTime 
+  dateOfBirth   DateTime
   createdAt     DateTime @default(now())
-  post          CampingPost[]
+  posts         CampingPost[] @relation("UserPosts")
+  joinCampingPosts JoinCampingPost[] @relation("UserJoinCampingPosts")
 }
 
 model CampingPost {
-  id           Int @id @default (autoincrement())
-  user          User @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  id           Int @id @default(autoincrement())
+  user          User @relation("UserPosts", fields: [organizerId], references: [id], onDelete: Cascade)
   title        String
   description  String
   location     String
   startDate    DateTime
   endDate      DateTime
-  equipment    String[]       @default ([])
+  equipment    String[] @default([])
   places       Int
   ageCategory  AgeCategory
-  images       String[]       @default ([])
+  images       String[] @default([])
   organizerId  Int
+  joinCampingPosts JoinCampingPost[] @relation("CampingPostJoinCampingPosts")
 }
 
 enum AgeCategory {
   ADULT
   TEEN
   KIDS
+}
+
+model JoinCampingPost {
+  userId      Int
+  postId      Int
+  user        User        @relation("UserJoinCampingPosts", fields: [userId], references: [id])
+  post        CampingPost @relation("CampingPostJoinCampingPosts", fields: [postId], references: [id])
+  rating      Int
+  reviews     String
+  favorite    String
+  notification String
+  @@id([userId, postId])
 }
 
 
