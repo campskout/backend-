@@ -4,9 +4,9 @@ const prisma = require('../database/prisma.js')
 const fetchJoinPosts = async (req, res) => {
     const users = await prisma.joinCampingPost.findMany({
         include: {
-        user: true,
-        post:true
-        },   
+            user: true,
+            post: true
+        },
     });
     return res.json({ status: 200, data: users });
 };
@@ -25,6 +25,11 @@ const createJoinPostCamping = async (req, res) => {
 
         if (!post) {
             return res.status(404).json({ status: 404, message: 'Post not found' });
+        }
+
+        // Check if there are available places
+        if (post.places <= 0) {
+            return res.status(400).json({ status: 400, message: 'No available places left' });
         }
 
         // Check if the JoinCampingPost entry already exists
@@ -53,12 +58,19 @@ const createJoinPostCamping = async (req, res) => {
             }
         });
 
-        return res.json({ status: 200, data: newJoinCampingPost, msg: 'JoinCampingPost created successfully.' });
+        // Decrement the post's available places
+        const updatedPost = await prisma.campingPost.update({
+            where: { id: postId },
+            data: { places: post.places - 1 }
+        });
+
+        return res.json({ status: 200, data: newJoinCampingPost, msg: 'JoinCampingPost created successfully.', updatedPost });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ status: 500, message: 'Internal Server Error' });
     }
 };
+
 
 const cancelJoinPostCamping = async (req, res) => {
     const { userId, postId } = req.body;
@@ -88,12 +100,23 @@ const cancelJoinPostCamping = async (req, res) => {
             }
         });
 
+        // Increment the post's available places
+        const post = await prisma.campingPost.findUnique({ where: { id: postId } });
+
+        if (post) {
+            await prisma.campingPost.update({
+                where: { id: postId },
+                data: { places: post.places + 1 }
+            });
+        }
+
         return res.json({ status: 200, message: 'JoinCampingPost entry successfully canceled' });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ status: 500, message: 'Internal Server Error' });
     }
 };
+
 
 const fetchOnePostJoin = async (req, res) => {
     const { userId, postId } = req.params; // Retrieve parameters from the request

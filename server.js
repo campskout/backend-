@@ -21,7 +21,7 @@ app.use('/api/users',usersRoutes)
 app.use('/api/camps',campsRoutes)
 app.use('/api/joinPosts',joinPostRoutes)
 
-const port = 5003
+const port = 5000
 
 app.listen(port,()=>console.log(`App listening on port ${port}!`))
 
