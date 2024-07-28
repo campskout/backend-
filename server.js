@@ -5,6 +5,9 @@ const campsRoutes= require ('./routes/camPost.js')
 const joinPostRoutes = require('./routes/joinPost.js')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
+
+const joiningRequestRoutes =require('../backend-/routes/acceptAndReject.js')
+
 const uplode=require('./routes/firebase.js')
 
 const app = express()
@@ -21,6 +24,7 @@ require('./security/passport')(passport)
 app.use('/api/users',usersRoutes)
 app.use('/api/camps',campsRoutes)
 app.use('/api/joinPosts',joinPostRoutes)
+app.use('/api/acceptAndReject', joiningRequestRoutes)
 app.use('/api/img',uplode)
 
 const port = 5000

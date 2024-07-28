@@ -12,7 +12,7 @@ const fetchJoinPosts = async (req, res) => {
 };
 
 const createJoinPostCamping = async (req, res) => {
-    const { userId, postId, rating, reviews, favorite, notification } = req.body;
+    const { userId, postId, rating, reviews, favorite, notification,status } = req.body;
 
     try {
         // Check if the user and post exist
@@ -54,7 +54,9 @@ const createJoinPostCamping = async (req, res) => {
                 rating,
                 reviews,
                 favorite,
-                notification
+                notification,
+                status 
+
             }
         });
 
