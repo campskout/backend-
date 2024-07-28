@@ -4,6 +4,7 @@ const prisma = require('../database/prisma.js')
 const fetchUsers = async (req, res) => {
     try {
         const users = await prisma.user.findMany({
+            
             include: {
                 posts: true, // Assuming this is a relation to another model named 'Post'
                 joinCampingPosts: {
