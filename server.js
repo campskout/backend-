@@ -3,6 +3,7 @@ const cors = require ('cors')
 const usersRoutes = require ('./routes/user.js')
 const campsRoutes= require ('./routes/camPost.js')
 const joinPostRoutes = require('./routes/joinPost.js')
+const experienceRoutes =require('./routes/experience.js')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 
@@ -26,6 +27,7 @@ app.use('/api/camps',campsRoutes)
 app.use('/api/joinPosts',joinPostRoutes)
 app.use('/api/acceptAndReject', joiningRequestRoutes)
 app.use('/api/img',uplode)
+app.use('/api/experienceTip', experienceRoutes)
 
 const port = 5000
 
