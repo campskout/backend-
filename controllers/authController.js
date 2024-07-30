@@ -39,6 +39,7 @@ const Login = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                imagesProfile:user.imagesProfile,
                 role: 'user'
             },
             process.env.JWT_SECRET, // Secret key for JWT signing
