@@ -60,9 +60,11 @@ const campingPostDetails = async (req, res) => {
             include: {
                 user: true,
                 joinCampingPosts: {
+                    where: {
+                        status: 'ACCEPTED' // Filter joinCampingPosts with status "ACCEPTED"
+                    },
                     include: {
-                        user: true, // Optionally include user details in joinCampingPosts
-                        post:true
+                        user: true // Optionally include user details in joinCampingPosts
                     }
                 }
             }
@@ -79,9 +81,11 @@ const campingPostDetails = async (req, res) => {
     }
 };
 
+ 
 module.exports = {
     fetchCampings,
     createPost,
-    campingPostDetails
+    campingPostDetails,
+    
     
 }

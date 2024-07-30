@@ -12,7 +12,7 @@ const fetchJoinPosts = async (req, res) => {
 };
 
 const createJoinPostCamping = async (req, res) => {
-    const { userId, postId, rating, reviews, favorite, notification } = req.body;
+    const { userId, postId, rating, reviews, favorite, notification, status } = req.body;
 
     try {
         // Check if the user and post exist
@@ -27,8 +27,8 @@ const createJoinPostCamping = async (req, res) => {
             return res.status(404).json({ status: 404, message: 'Post not found' });
         }
 
-        // Check if there are available places
-        if (post.places <= 0) {
+        // Check if there are available places if status is 'ACCEPTED'
+        if (status === 'ACCEPTED' && post.places <= 0) {
             return res.status(400).json({ status: 400, message: 'No available places left' });
         }
 
@@ -54,22 +54,28 @@ const createJoinPostCamping = async (req, res) => {
                 rating,
                 reviews,
                 favorite,
-                notification
+                notification,
+                status
             }
         });
 
-        // Decrement the post's available places
-        const updatedPost = await prisma.campingPost.update({
-            where: { id: postId },
-            data: { places: post.places - 1 }
-        });
+        // Update the post's available places based on the status
+        if (status === 'ACCEPTED') {
+            const updatedPost = await prisma.campingPost.update({
+                where: { id: postId },
+                data: { places: post.places - 1 }
+            });
 
-        return res.json({ status: 200, data: newJoinCampingPost, msg: 'JoinCampingPost created successfully.', updatedPost });
+            return res.json({ status: 200, data: newJoinCampingPost, msg: 'JoinCampingPost created successfully.', updatedPost });
+        } else {
+            return res.json({ status: 200, data: newJoinCampingPost, msg: 'JoinCampingPost created successfully.' });
+        }
     } catch (error) {
         console.error(error);
         return res.status(500).json({ status: 500, message: 'Internal Server Error' });
     }
 };
+
 
 
 const cancelJoinPostCamping = async (req, res) => {
@@ -127,7 +133,8 @@ const fetchOnePostJoin = async (req, res) => {
             where: {
                 userId_postId: {
                     userId: parseInt(userId, 10),
-                    postId: parseInt(postId, 10)
+                    postId: parseInt(postId, 10),
+                    
                 }
             },
             include: {

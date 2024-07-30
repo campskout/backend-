@@ -67,9 +67,14 @@ model JoinCampingPost {
   favorite    String
   notification String
   @@id([userId, postId])
+  status    JoiningStatus
 }
 
-
+enum JoiningStatus {
+  PENDING 
+  ACCEPTED
+  REJECTED
+}
 
 
 
