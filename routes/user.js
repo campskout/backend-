@@ -11,6 +11,7 @@ router.post('/login', Login);
 router.post('/register', validateRegister(), registerUser);
 router.post('/updateInterests', passport.authenticate('jwt', { session: false }), updateUserInterests);
 
+
 // routes test
 router.get('/test', passport.authenticate('jwt', { session: false }),Test)
 router.get('/admin', passport.authenticate('jwt', { session: false }), inRole(ROLES.admin), Admin)
