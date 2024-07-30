@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  Men
+  Female
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  name          String
+  address       String
+  interests    String[] @default(["Hiking", "Kayaking", "Fishing","Climbing","Hiking","Others"])
+  imagesProfile String[]
+  gender        Gender
+  bio           String
+  phoneNumber   String
+  dateOfBirth   DateTime
+  createdAt     DateTime @default(now())
+  posts         CampingPost[] @relation("UserPosts")
+  joinCampingPosts JoinCampingPost[] @relation("UserJoinCampingPosts")
+}
+
+model CampingPost {
+  id           Int @id @default(autoincrement())
+  user          User @relation("UserPosts", fields: [organizerId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  location     String
+  startDate    DateTime
+  endDate      DateTime
+  equipment    String[] @default([])
+  places       Int
+  ageCategory  AgeCategory
+  images       String[] @default([])
+  organizerId  Int
+  joinCampingPosts JoinCampingPost[] @relation("CampingPostJoinCampingPosts")
+  category     CategoryCamping
+}
+
+enum AgeCategory {
+  ADULT
+  TEEN
+  KIDS
+}
+
+model JoinCampingPost {
+  userId      Int
+  postId      Int
+  user        User        @relation("UserJoinCampingPosts", fields: [userId], references: [id])
+  post        CampingPost @relation("CampingPostJoinCampingPosts", fields: [postId], references: [id])
+  rating      Int
+  reviews     String
+  favorite    String
+  notification String
+  @@id([userId, postId])
+  status    JoiningStatus
+}
+
+enum JoiningStatus {
+  PENDING 
+  ACCEPTED
+  REJECTED
+}
+
+enum CategoryCamping {
+ Hiking
+ Kayaking
+ Fishing
+ Climbing
+ Hitchhiking
+}
+
+
+
+
