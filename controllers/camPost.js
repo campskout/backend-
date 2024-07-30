@@ -60,9 +60,11 @@ const campingPostDetails = async (req, res) => {
             include: {
                 user: true,
                 joinCampingPosts: {
+                    where: {
+                        status: 'ACCEPTED' // Filter joinCampingPosts with status "ACCEPTED"
+                    },
                     include: {
-                        user: true, // Optionally include user details in joinCampingPosts
-                        post:true
+                        user: true // Optionally include user details in joinCampingPosts
                     }
                 }
             }
@@ -78,6 +80,7 @@ const campingPostDetails = async (req, res) => {
         return res.status(500).json({ status: 500, message: 'Internal Server Error' });
     }
 };
+
  
 module.exports = {
     fetchCampings,
