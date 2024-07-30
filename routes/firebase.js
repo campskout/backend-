@@ -1,10 +1,10 @@
-const express = require('express');
-const router = express.Router();
+// const express = require('express');
+// const router = express.Router();
 
-const {creat}= require('../controllers/firebase/firebase')
+// const {creat}= require('../controllers/firebase/firebase')
 
-router.post('/upload-image',creat)
+// router.post('/upload-image',creat)
 
 
 
-module.exports = router;
+// module.exports = router;
