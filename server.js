@@ -21,7 +21,7 @@ require('./security/passport')(passport)
 app.use('/api/users',usersRoutes)
 app.use('/api/camps',campsRoutes)
 app.use('/api/joinPosts',joinPostRoutes)
-app.use('/api/img',uplode)
+// app.use('/api/img',uplode)
 
 const port = 5000
 
