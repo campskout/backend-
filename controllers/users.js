@@ -25,24 +25,57 @@ const fetchUsers = async (req, res) => {
     }
 };
 
-const getUserById = async (req, res) => {
-    const userId = req.params.id;
-
-    // Ensure userId is a valid number
-    if (!Number(userId) || Number(userId) <= 0) {
+const getUserById1= async (req, res) => {
+    const   userId = req.params.id; // Extract the user ID from the request parameters
+     // Ensure userId is a valid number
+     if (!Number(userId) || Number(userId) <= 0) {
         return res.status(400).json({ message: 'Invalid user ID' });
     }
 
     try {
-        // Fetch the user and their camping posts
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(userId), // Convert the id to a number if it's not already
+            },
+            include: {
+                posts: true, // Assuming this is a relation to another model named 'Post'
+                joinCampingPosts: {
+                    include: {
+                        post: true, // To include the associated CampingPost
+                    }
+                },
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({ status: 404, message: 'User not found' });
+        }
+
+        return res.json({ status: 200, data: user });
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        return res.status(500).json({ status: 500, message: 'Internal Server Error' });
+    }
+};
+
+const getUserById = async (req, res) => {
+    const userId = parseInt(req.params.id, 10);
+
+    // Ensure userId is a valid number
+    if (isNaN(userId) || userId <= 0) {
+        return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    try {
+        // Fetch the user and their camping posts including users who joined the posts
         const userWithPosts = await prisma.user.findUnique({
-            where: { id: Number(userId) },
+            where: { id: userId },
             include: {
                 posts: {
                     include: {
                         joinCampingPosts: {
                             include: {
-                                user: true, // Include the user who joined the camping post
+                                user: true, // Include the users who joined the camping post
                             },
                         },
                     },
@@ -54,23 +87,17 @@ const getUserById = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Extract posts
-        const posts = userWithPosts.posts || [];
-
         // Prepare an object to hold the posts and the users who joined them
-        const postUsers = {};
-
-        // Iterate over each post and collect users who joined
-        for (const post of posts) {
+        const postUsers = userWithPosts.posts.map(post => {
             const joinedUsers = post.joinCampingPosts
-                .filter(join => join.userId !== Number(userId)) // Exclude the original user
+                .filter(join => join.userId !== userId) // Exclude the original user
                 .map(join => join.user); // Map to user objects
-            
-            postUsers[post.id] = {
+
+            return {
                 post,
                 joinedUsers,
             };
-        }
+        });
 
         // Respond with the user data and the joined users for each post
         res.json({
@@ -82,6 +109,9 @@ const getUserById = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
+
 
 module.exports = {
     fetchUsers,
