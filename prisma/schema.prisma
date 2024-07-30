@@ -33,6 +33,7 @@ model User {
   createdAt     DateTime @default(now())
   posts         CampingPost[] @relation("UserPosts")
   joinCampingPosts JoinCampingPost[] @relation("UserJoinCampingPosts")
+  experiences     ExperiencesTips[]  @relation("UserExperiences")
 }
 
 model CampingPost {
@@ -85,6 +86,62 @@ enum CategoryCamping {
  Hitchhiking
 }
 
+model ExperiencesTips {
+  id           Int @id @default(autoincrement())
+  title        String
+  content      String
+  imagesUrl    String[]
+  location     String
+  category        CategoryExperiences
+  filterCategory  FiltreCategory
+  likeCounter   Int
+  shareCounter  Int
+  user          User @relation("UserExperiences", fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  createdAt     DateTime @default(now())
+  likes         Like[] @relation("LikeExperiences")
+  comments      Comments[] @relation("CommentsExperiences")
+  shares        Share[]  @relation("ShareExperiences")
+  
+}
 
+enum CategoryExperiences {
+ Experiences
+ Tips
+}
 
+enum FiltreCategory {
+  ShelterAndSleeping
+  CookingAndEating
+  ClothingAndFootwear
+  NavigationAndSafety
+  PersonalItemsAndComfort
+  Miscellaneous
+  OptionalButUseful
+}
 
+model Like {
+  id           Int @id @default(autoincrement())
+  experience    ExperiencesTips  @relation("LikeExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
+  experienceId        Int
+}
+
+model Comments {
+  id           Int @id @default(autoincrement())
+  content      String
+  experience    ExperiencesTips @relation("CommentsExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
+  experienceId  Int
+}
+
+model Share {
+  id           Int @id @default(autoincrement())
+  experience    ExperiencesTips @relation("ShareExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
+  experienceId   Int
+}
+
+model Admin {
+  id           Int @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  name          String
+}
