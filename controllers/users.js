@@ -43,39 +43,6 @@ const updateUserInterests = async (req, res) => {
         return res.status(500).json({ status: 500, message: 'Internal Server Error' });
     }
 };
-const getUserById = async (req, res) => {
-    const userId = req.params.id;
-
-    // Ensure userId is a valid number
-    if (!Number(userId) || Number(userId) <= 0) {
-        return res.status(400).json({ message: 'Invalid user ID' });
-    }
-
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: Number(userId), // Convert the id to a number if it's not already
-            },
-            include: {
-                posts: true, // Assuming this is a relation to another model named 'Post'
-                joinCampingPosts: {
-                    include: {
-                        post: true, // To include the associated CampingPost
-                    }
-                },
-            },
-        });
-
-        if (!user) {
-            return res.status(404).json({ status: 404, message: 'User not found' });
-        }
-
-        return res.json({ status: 200, data: user });
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        return res.status(500).json({ status: 500, message: 'Internal Server Error' });
-    }
-};
 
 const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id, 10);
