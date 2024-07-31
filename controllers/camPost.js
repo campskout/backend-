@@ -27,7 +27,7 @@ const createPost = async (req, res) => {
         equipment,
         places,
         ageCategory,
-        images,category } = req.body;
+        images,category ,status } = req.body;
 
     const newPost = await prisma.campingPost.create({
         data: {
@@ -42,6 +42,7 @@ const createPost = async (req, res) => {
             ageCategory,
             images,
             category,
+            status 
         },
     });
 

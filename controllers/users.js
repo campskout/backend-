@@ -6,11 +6,16 @@ const fetchUsers = async (req, res) => {
             
             include: {
                 posts: true,
+
                 joinCampingPosts: {
                     include: {
                         post: true,
                     }
                 },
+                experiences:true,
+                likes:true,
+                comments:true,
+                shares:true
             },
             orderBy: {
                 id: "desc",
