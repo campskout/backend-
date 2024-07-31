@@ -67,7 +67,7 @@ const getUserById = async (req, res) => {
                         joinCampingPosts: {
                             include: {
                                 user: true, // Include the users who joined the camping post
-                                campingPost: true // Include the camping post details
+                                post: true // Include the camping post details
                             },
                         },
                     },
@@ -107,11 +107,22 @@ const getUserById = async (req, res) => {
 };
 
 
-
+// * Delete user
+ const deleteUser = async (req, res) => {
+    const userId = req.params.id;
+    await prisma.user.delete({
+      where: {
+        id: Number(userId),
+      },
+    });
+  
+    return res.json({ status: 200, msg: "User deleted successfully" });
+  };
 
 
 module.exports = {
     fetchUsers,
     updateUserInterests,
-    getUserById 
+    getUserById,
+    deleteUser
 };
