@@ -61,7 +61,7 @@ console.log(fields, files)
       }));
 
       // Extract the rest of the fields
-      const { organizerId, title, description, location, startDate, endDate, equipment, places, ageCategory } = fields;
+      const { organizerId, title, description, location, startDate, endDate, equipment, places, ageCategory,category,status } = fields;
 
       // Create the new camping post with the image URLs
       const newPost = await prisma.campingPost.create({
@@ -75,6 +75,8 @@ console.log(fields, files)
           equipment,
           places: Number(places),
           ageCategory: Array.isArray(ageCategory) ? ageCategory[0] : ageCategory,
+          category: Array.isArray(category) ? category[0] : category,
+          status: Array.isArray(status) ? status[0] : status,
           images: imageUrls, // Store the array of image URLs
         },
       });
