@@ -82,13 +82,22 @@ const unlikeExperience = async (req, res) => {
       return res.status(404).json({ message: 'Experience not found.' });
     }
 
-    // Find and delete the like record
+    // Find the like record
+    const existingLike = await prisma.like.findFirst({
+      where: {
+        experienceId: parseInt(experienceId),
+        userId: parseInt(userId),
+      },
+    });
+
+    if (!existingLike) {
+      return res.status(404).json({ message: 'Like not found.' });
+    }
+
+    // Delete the like record
     await prisma.like.delete({
       where: {
-        experienceId_userId: {
-          experienceId: parseInt(experienceId),
-          userId: parseInt(userId),
-        },
+        id: existingLike.id, // Use the ID of the existing like
       },
     });
 
