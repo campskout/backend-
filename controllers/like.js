@@ -1,95 +1,107 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// Like an experience
 const likeExperience = async (req, res) => {
-  const experienceId = Number(req.params.experienceId);
-  const userId = Number(req.body.userId);
+  const { experienceId } = req.params;
+  const { userId } = req.body;
 
   try {
-    // Check if the like already exists
-    const existingLike = await prisma.like.findUnique({
+    // Check if the user exists
+    const userExists = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Check if the experience exists
+    const experienceExists = await prisma.experiencesTips.findUnique({
+      where: { id: parseInt(experienceId) },
+    });
+
+    if (!experienceExists) {
+      return res.status(404).json({ message: 'Experience not found.' });
+    }
+
+    // Check if the user has already liked the experience
+    const existingLike = await prisma.like.findFirst({
       where: {
-        userId_experienceId: {
-          userId,
-          experienceId,
-        },
+        experienceId: parseInt(experienceId),
+        userId: parseInt(userId),
       },
     });
 
     if (existingLike) {
-      // Unlike the experience
-      await prisma.like.delete({
-        where: {
-          id: existingLike.id,
-        },
-      });
-
-      // Update likeCounter in ExperiencesTips
-      await prisma.experiencesTips.update({
-        where: { id: experienceId },
-        data: { likeCounter: { decrement: 1 } },
-      });
-
-      return res.status(200).json({ message: 'Experience unliked successfully' });
-    } else {
-      // Like the experience
-      const like = await prisma.like.create({
-        data: {
-          experienceId,
-          userId,
-        },
-      });
-
-      // Update likeCounter in ExperiencesTips
-      await prisma.experiencesTips.update({
-        where: { id: experienceId },
-        data: { likeCounter: { increment: 1 } },
-      });
-
-      return res.status(201).json(like);
+      return res.status(400).json({ message: 'You have already liked this experience.' });
     }
+
+    // Create a new like
+    await prisma.like.create({
+      data: {
+        experienceId: parseInt(experienceId),
+        userId: parseInt(userId),
+      },
+    });
+
+    // Increment like counter for the experience
+    await prisma.experiencesTips.update({
+      where: { id: parseInt(experienceId) },
+      data: { likeCounter: { increment: 1 } },
+    });
+
+    res.status(200).json({ message: 'Experience liked successfully.' });
   } catch (error) {
-    console.error('Error liking/unliking experience:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while liking the experience.' });
   }
 };
 
+// Unlike an experience
 const unlikeExperience = async (req, res) => {
-  const experienceId = Number(req.params.experienceId);
-  const userId = Number(req.body.userId);
+  const { experienceId } = req.params;
+  const { userId } = req.body;
 
   try {
-    // Check if the like exists
-    const existingLike = await prisma.like.findUnique({
+    // Check if the user exists
+    const userExists = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Check if the experience exists
+    const experienceExists = await prisma.experiencesTips.findUnique({
+      where: { id: parseInt(experienceId) },
+    });
+
+    if (!experienceExists) {
+      return res.status(404).json({ message: 'Experience not found.' });
+    }
+
+    // Find and delete the like record
+    await prisma.like.delete({
       where: {
-        userId_experienceId: {
-          userId,
-          experienceId,
+        experienceId_userId: {
+          experienceId: parseInt(experienceId),
+          userId: parseInt(userId),
         },
       },
     });
 
-    if (!existingLike) {
-      return res.status(400).json({ message: 'Like not found' });
-    }
-
-    // Delete the like
-    await prisma.like.delete({
-      where: {
-        id: existingLike.id,
-      },
-    });
-
-    // Update likeCounter in ExperiencesTips
+    // Decrement like counter for the experience
     await prisma.experiencesTips.update({
-      where: { id: experienceId },
+      where: { id: parseInt(experienceId) },
       data: { likeCounter: { decrement: 1 } },
     });
 
-    return res.status(200).json({ message: 'Experience unliked successfully' });
+    res.status(200).json({ message: 'Experience unliked successfully.' });
   } catch (error) {
-    console.error('Error unliking experience:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while unliking the experience.' });
   }
 };
 
