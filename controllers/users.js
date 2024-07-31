@@ -62,6 +62,7 @@ const getUserById = async (req, res) => {
                         joinCampingPosts: {
                             include: {
                                 user: true, // Include the users who joined the camping post
+                                campingPost: true // Include the camping post details
                             },
                         },
                     },
@@ -73,11 +74,15 @@ const getUserById = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Prepare an object to hold the posts and the users who joined them
+        // Prepare an object to hold the posts, the users who joined them, and reviews/ratings
         const postUsers = userWithPosts.posts.map(post => {
             const joinedUsers = post.joinCampingPosts
                 .filter(join => join.userId !== userId) // Exclude the original user
-                .map(join => join.user); // Map to user objects
+                .map(join => ({
+                    user: join.user,
+                    rating: join.rating, // Add rating
+                    review: join.review // Add review
+                })); // Map to user objects with ratings/reviews
 
             return {
                 post,
@@ -88,13 +93,14 @@ const getUserById = async (req, res) => {
         // Respond with the user data and the joined users for each post
         res.json({
             user: userWithPosts,
-            posts: postUsers, // Contains posts and their joined users
+            posts: postUsers, // Contains posts and their joined users with reviews/ratings
         });
     } catch (error) {
         console.error('Error fetching user:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 
 
 

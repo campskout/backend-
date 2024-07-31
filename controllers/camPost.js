@@ -112,13 +112,46 @@ const onePostParticipants = async (req, res) => {
     }
 };
 
+const updateReview = async (req, res) => {
+    const { postId, userId, rating, reviews } = req.body;
 
- 
+    // Validate the input
+    if (typeof rating !== 'number' || typeof reviews !== 'string' || !postId || !userId) {
+        return res.status(400).json({ status: 400, message: 'Invalid input' });
+    }
+
+    try {
+        // Log the input data for debugging
+        console.log('Updating review with:', { postId, userId, rating, reviews });
+
+        // Update the review in the JoinCampingPost table
+        const updatedJoin = await prisma.joinCampingPost.update({
+            where: {
+                userId_postId: {
+                    userId: Number(userId),
+                    postId: Number(postId),
+                },
+            },
+            data: {
+                rating,
+                reviews,
+            },
+        });
+
+        // Return a success response
+        return res.json({ status: 200, data: updatedJoin, msg: "Review updated successfully." });
+    } catch (error) {
+        // Log and return the error
+        console.error('Error updating review:', error);
+        return res.status(500).json({ status: 500, message: 'Internal Server Error' });
+    }
+};
+
+
 module.exports = {
     fetchCampings,
     createPost,
     campingPostDetails,
-    onePostParticipants
-    
-    
+    onePostParticipants,
+    updateReview
 }
