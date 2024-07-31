@@ -152,41 +152,76 @@ const onePostParticipants = async (req, res) => {
     return res.status(500).json({ status: 500, message: 'Internal Server Error' });
   }
 };
+/////////////////////////////////////////////////////////   Create Review and Ratings
+
 
 const updateReview = async (req, res) => {
-    const { postId, userId, rating, reviews } = req.body;
+  const { postId, userId, rating, reviews } = req.body;
 
-    // first we need to validate the input
-    if (typeof rating !== 'number' || typeof reviews !== 'string' || !postId || !userId) {
-        return res.status(400).json({ status: 400, message: 'Invalid input' });
-    }
+  // Validate the input
+  if (typeof rating !== 'number' || typeof reviews !== 'string' || !postId || !userId) {
+      return res.status(400).json({ status: 400, message: 'Invalid input' });
+  }
 
-    try {
-        // console.Log the input data for debugging
-        console.log('Updating review with:', { postId, userId, rating, reviews });
+  try {
+      // Fetch the camping post
+      const campingPost = await prisma.campingPost.findUnique({
+          where: {
+              id: Number(postId),
+          },
+          select: {
+              status: true, // Get the status of the camping post
+              joinCampingPosts: {
+                  where: {
+                      userId: Number(userId)
+                  },
+                  select: {
+                      status: true // Get the user's status in relation to the camping post
+                  }
+              }
+          }
+      });
 
-        // Update the review in the JoinCampingPost table
-        const updatedJoin = await prisma.joinCampingPost.update({
-            where: {
-                userId_postId: {
-                    userId: Number(userId),
-                    postId: Number(postId),
-                },
-            },
-            data: {
-                rating,
-                reviews,
-            },
-        });
+      if (!campingPost) {
+          return res.status(404).json({ status: 404, message: 'CampingPost not found' });
+      }
 
-        // Return a success response
-        return res.json({ status: 200, data: updatedJoin, msg: "Review updated successfully." });
-    } catch (error) {
-        // Log and return the error
-        console.error('Error updating review:', error);
-        return res.status(500).json({ status: 500, message: 'Internal Server Error' });
-    }
+      // Check if the camping post status is 'Completed'
+      if (campingPost.status !== 'Completed') {
+          return res.status(400).json({ status: 400, message: 'Trip is not completed so you cant review or rate yet' });
+      }
+
+      // Check if the user status is 'ACCEPTED'
+      const userStatus = campingPost.joinCampingPosts.length > 0 ? campingPost.joinCampingPosts[0].status : null;
+      if (userStatus !== 'ACCEPTED') {
+          return res.status(400).json({ status: 400, message: 'You are not accepted to join this trip so you are not allowed to  review or rate the trip' });
+      }
+
+      // Update the review in the JoinCampingPost table
+      const updatedJoin = await prisma.joinCampingPost.update({
+          where: {
+              userId_postId: {
+                  userId: Number(userId),
+                  postId: Number(postId),
+              },
+          },
+          data: {
+              rating,
+              reviews,
+          },
+      });
+
+      // Return a success response
+      return res.json({ status: 200, data: updatedJoin, msg: "Review updated successfully." });
+  } catch (error) {
+      // Log and return the error
+      console.error('Error updating review:', error);
+      return res.status(500).json({ status: 500, message: 'Internal Server Error' });
+  }
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
 
 const fetchCampings = async (req, res) => {
     const campings = await prisma.campingPost.findMany({
