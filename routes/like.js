@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const {likeExperience,unlikeExperience} = require('../controllers/like');
+const { likeExperience, unlikeExperience } = require('../controllers/like');
 
-// Route to handle adding a like
-// Like a post
+// Route to like an experience
 router.post('/:experienceId/like', likeExperience);
 
-// Unlike a post
-router.delete('/:experienceId/like', unlikeExperience);
+// Route to unlike an experience
+router.delete('/:experienceId/unlike', unlikeExperience);
 
 module.exports = router;

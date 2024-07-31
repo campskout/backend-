@@ -7,23 +7,24 @@ const likeExperience = async (req, res) => {
 
   try {
     // Check if the like already exists
-    const existingLikes = await prisma.like.findMany({
+    const existingLike = await prisma.like.findUnique({
       where: {
-        experienceId,
-        userId,
+        userId_experienceId: {
+          userId,
+          experienceId,
+        },
       },
-      take: 1,
     });
 
-    if (existingLikes.length > 0) {
+    if (existingLike) {
       // Unlike the experience
       await prisma.like.delete({
         where: {
-          id: existingLikes[0].id,
+          id: existingLike.id,
         },
       });
 
-      // Optionally, update likeCounter in ExperiencesTips
+      // Update likeCounter in ExperiencesTips
       await prisma.experiencesTips.update({
         where: { id: experienceId },
         data: { likeCounter: { decrement: 1 } },
@@ -39,7 +40,7 @@ const likeExperience = async (req, res) => {
         },
       });
 
-      // Optionally, update likeCounter in ExperiencesTips
+      // Update likeCounter in ExperiencesTips
       await prisma.experiencesTips.update({
         where: { id: experienceId },
         data: { likeCounter: { increment: 1 } },
@@ -59,26 +60,27 @@ const unlikeExperience = async (req, res) => {
 
   try {
     // Check if the like exists
-    const existingLikes = await prisma.like.findMany({
+    const existingLike = await prisma.like.findUnique({
       where: {
-        experienceId,
-        userId,
+        userId_experienceId: {
+          userId,
+          experienceId,
+        },
       },
-      take: 1,
     });
 
-    if (existingLikes.length === 0) {
+    if (!existingLike) {
       return res.status(400).json({ message: 'Like not found' });
     }
 
     // Delete the like
     await prisma.like.delete({
       where: {
-        id: existingLikes[0].id,
+        id: existingLike.id,
       },
     });
 
-    // Optionally, update likeCounter in ExperiencesTips
+    // Update likeCounter in ExperiencesTips
     await prisma.experiencesTips.update({
       where: { id: experienceId },
       data: { likeCounter: { decrement: 1 } },

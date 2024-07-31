@@ -34,6 +34,9 @@ model User {
   posts         CampingPost[] @relation("UserPosts")
   joinCampingPosts JoinCampingPost[] @relation("UserJoinCampingPosts")
   experiences     ExperiencesTips[]  @relation("UserExperiences")
+  likes           Like[] @relation("UserLikes")
+  comments        Comments[] @relation("UserComments")
+  shares          Share[] @relation("UserShares")
 }
 
 model CampingPost {
@@ -51,12 +54,21 @@ model CampingPost {
   organizerId  Int
   joinCampingPosts JoinCampingPost[] @relation("CampingPostJoinCampingPosts")
   category     CategoryCamping
+  status       StatusCampingPost
 }
 
 enum AgeCategory {
   ADULT
   TEEN
   KIDS
+}
+
+enum StatusCampingPost{
+  PENDING
+  InProgress
+  Completed
+  Canceled
+  Delegated  
 }
 
 model JoinCampingPost {
@@ -124,6 +136,8 @@ model Like {
   id           Int @id @default(autoincrement())
   experience    ExperiencesTips  @relation("LikeExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
   experienceId        Int
+  user          User @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
 }
 
 model Comments {
@@ -131,12 +145,16 @@ model Comments {
   content      String
   experience    ExperiencesTips @relation("CommentsExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
   experienceId  Int
+  user          User @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
 }
 
 model Share {
   id           Int @id @default(autoincrement())
   experience    ExperiencesTips @relation("ShareExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
   experienceId   Int
+  user          User @relation("UserShares", fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
 }
 
 model Admin {
