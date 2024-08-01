@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require('passport');
 const { ROLES, inRole } = require('../security/Rolemiddleware');
 const { fetchUsers, updateUserInterests , getUserById,deleteUser} = require('../controllers/users.js');
-const { Login, Test, Admin } = require('../controllers/authController.js');
+const { Login, Test, Admin,authenticateToken,changePassword } = require('../controllers/authController.js');
 const { validateRegister, registerUser } = require("../controllers/Authentication");
 
 router.get('/get', fetchUsers);
@@ -18,5 +18,7 @@ router.get('/admin', passport.authenticate('jwt', { session: false }), inRole(RO
 // get user by id  
 router.get('/:id', getUserById);
 router.delete('/:id',deleteUser)
+
+router.post('/changePassword',authenticateToken,changePassword)
 
 module.exports = router;
