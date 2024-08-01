@@ -40,17 +40,17 @@ const Login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 imagesProfile:user.imagesProfile,
-                role: 'admin'
+                role: 'user'
             },
             process.env.JWT_SECRET, // Secret key for JWT signing
-            { expiresIn: '48h' }     // Token expiration time
+            { expiresIn: '1h' }     // Token expiration time
         );
 
         // Return success message along with the generated token
         res.status(200).json({
             message: "success",
             token: "Bearer " + token, // Prefixing the token with 'Bearer ' as per convention
-            role: 'admin'
+            role: 'user'
         });
 
     } catch (error) {
