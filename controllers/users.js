@@ -62,7 +62,7 @@ const getUserById = async (req, res) => {
                         joinCampingPosts: {
                             include: {
                                 user: true, // Include the users who joined the camping post
-                                campingPost: true // Include the camping post details
+                                post: true // Include the camping post details
                             },
                         },
                     },
