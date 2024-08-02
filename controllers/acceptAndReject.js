@@ -8,7 +8,7 @@ exports.acceptRequest = async (req, res) => {
   try {
     const request = await prisma.joinCampingPost.update({
       where: { userId_postId: { userId: parseInt(userId), postId: parseInt(postId) } },
-      data: { status: 'ACCEPTED' }
+      data: { status: 'ACCEPTED',notification:'Your JoinCampingPost accepted successfully!' }
     });
     res.json(request);
   } catch (error) {
@@ -24,7 +24,7 @@ exports.rejectRequest = async (req, res) => {
   try {
     const request = await prisma.joinCampingPost.update({
       where: { userId_postId: { userId: parseInt(userId), postId: parseInt(postId) } },
-      data: { status: 'REJECTED' }
+      data: { status: 'REJECTED' ,notification:'Your JoinCampingPost rejected !'}
     });
     res.json(request);
   } catch (error) {

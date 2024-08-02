@@ -3,7 +3,7 @@ const prisma = require('../database/prisma.js');
 const fetchUsers = async (req, res) => {
     try {
         const users = await prisma.user.findMany({
-            
+
             include: {
                 posts: true,
 
@@ -12,10 +12,10 @@ const fetchUsers = async (req, res) => {
                         post: true,
                     }
                 },
-                experiences:true,
-                likes:true,
-                comments:true,
-                shares:true
+                experiences: true,
+                likes: true,
+                comments: true,
+                shares: true
             },
             orderBy: {
                 id: "desc",
@@ -70,9 +70,21 @@ const getUserById = async (req, res) => {
                                 post: true // Include the camping post details
                             },
                         },
+
                     },
+
                 },
+                joinCampingPosts: {
+                    include: {
+                        post: true,
+                    }
+                },
+                experiences: true,
+                likes: true,
+                comments: true,
+                shares: true,
             },
+
         });
 
         if (!userWithPosts) {
@@ -108,16 +120,16 @@ const getUserById = async (req, res) => {
 
 
 // * Delete user
- const deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
     const userId = req.params.id;
     await prisma.user.delete({
-      where: {
-        id: Number(userId),
-      },
+        where: {
+            id: Number(userId),
+        },
     });
-  
+
     return res.json({ status: 200, msg: "User deleted successfully" });
-  };
+};
 
 
 module.exports = {
