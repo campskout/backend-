@@ -5,7 +5,11 @@ const fetchUsers = async (req, res) => {
         const users = await prisma.user.findMany({
 
             include: {
-                posts: true,
+                posts: {
+                    include: {
+                        user: true
+                    }
+                },
 
                 joinCampingPosts: {
                     include: {
@@ -63,7 +67,9 @@ const getUserById = async (req, res) => {
             where: { id: userId },
             include: {
                 posts: {
+
                     include: {
+                        user: true,
                         joinCampingPosts: {
                             include: {
                                 user: true, // Include the users who joined the camping post
