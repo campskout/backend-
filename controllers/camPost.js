@@ -101,9 +101,7 @@ const campingPostDetails = async (req, res) => {
             include: {
                 user: true,
                 joinCampingPosts: {
-                    where: {
-                        status: 'ACCEPTED' // Filter joinCampingPosts with status "ACCEPTED"
-                    },
+                   
                     include: {
                         user: true // Optionally include user details in joinCampingPosts
                     }
