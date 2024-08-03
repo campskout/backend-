@@ -43,8 +43,6 @@ const updateUserInterests = async (req, res) => {
     try {
         // Ensure userId is an integer
         const userIdInt = parseInt(userId, 10);
-
-        
         if (isNaN(userIdInt)) {
             return res.status(400).json({ status: 400, message: 'Invalid user ID' });
         }
