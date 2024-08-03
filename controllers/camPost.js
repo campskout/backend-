@@ -68,18 +68,19 @@ const createPost = async (req, res) => {
           return signedUrl; // Return the signed URL
         }))
       } else {
-        if (fields.category === 'Hiking') {
+        if (category === 'Hiking') {
           imageUrls.push(defaultImgs.Hiking)
-        } if (fields.category === 'Kayaking') {
+        } if (category === 'Kayaking') {
           imageUrls.push(defaultImgs.Kayaking)
-        } if (fields.category === 'Fishing') {
+        } if (category === 'Fishing') {
           imageUrls.push(defaultImgs.Fishing)
-        } if (fields.category === 'Climbing') {
+        } if (category === 'Climbing') {
           imageUrls.push(defaultImgs.Climbing)
-        } if (fields.category === 'Hitchhiking') {
+        } if (category === 'Hitchhiking') {
           imageUrls.push(defaultImgs.Hitchhiking)
         }
       }
+console.log(imageUrls,'iiiiiiiii',defaultImgs,'eeeeee',category,'rrrr');
 
       // Create the new camping post with the image URLs
       const newPost = await prisma.campingPost.create({
