@@ -3,19 +3,23 @@ const prisma = require('../database/prisma.js');
 const fetchUsers = async (req, res) => {
     try {
         const users = await prisma.user.findMany({
-            
+
             include: {
-                posts: true,
+                posts: {
+                    include: {
+                        user: true
+                    }
+                },
 
                 joinCampingPosts: {
                     include: {
                         post: true,
                     }
                 },
-                experiences:true,
-                likes:true,
-                comments:true,
-                shares:true
+                experiences: true,
+                likes: true,
+                comments: true,
+                shares: true
             },
             orderBy: {
                 id: "desc",
@@ -37,8 +41,16 @@ const updateUserInterests = async (req, res) => {
     }
 
     try {
+        // Ensure userId is an integer
+        const userIdInt = parseInt(userId, 10);
+
+        
+        if (isNaN(userIdInt)) {
+            return res.status(400).json({ status: 400, message: 'Invalid user ID' });
+        }
+
         const updatedUser = await prisma.user.update({
-            where: { id: userId },
+            where: { id: userIdInt }, // Use integer ID here
             data: { interests: interests },
         });
 
@@ -48,6 +60,7 @@ const updateUserInterests = async (req, res) => {
         return res.status(500).json({ status: 500, message: 'Internal Server Error' });
     }
 };
+
 
 const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id, 10);
@@ -63,16 +76,30 @@ const getUserById = async (req, res) => {
             where: { id: userId },
             include: {
                 posts: {
+
                     include: {
+                        user:true,
                         joinCampingPosts: {
                             include: {
                                 user: true, // Include the users who joined the camping post
                                 post: true // Include the camping post details
                             },
                         },
+
                     },
+
                 },
+                joinCampingPosts: {
+                    include: {
+                        post: true,
+                    }
+                },
+                experiences: true,
+                likes: true,
+                comments: true,
+                shares: true,
             },
+
         });
 
         if (!userWithPosts) {
@@ -108,16 +135,16 @@ const getUserById = async (req, res) => {
 
 
 // * Delete user
- const deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
     const userId = req.params.id;
     await prisma.user.delete({
-      where: {
-        id: Number(userId),
-      },
+        where: {
+            id: Number(userId),
+        },
     });
-  
+
     return res.json({ status: 200, msg: "User deleted successfully" });
-  };
+};
 
 
 module.exports = {
