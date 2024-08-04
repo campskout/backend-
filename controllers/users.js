@@ -147,9 +147,53 @@ const deleteUser = async (req, res) => {
 };
 
 
+  /////////////////////////////////////
+  const searchUsersByName = async (req, res) => {
+    const { name } = req.query;
+
+    if (!name) {
+        return res.status(400).json({ status: 400, message: 'Name query parameter is required' });
+    }
+
+    try {
+        
+        const users = await prisma.user.findMany({
+            where: {
+                name: {
+                    contains: name,
+                    mode: 'insensitive', 
+                },
+            },
+            include: {
+                posts: true,
+                joinCampingPosts: {
+                    include: {
+                        post: true,
+                    }
+                },
+                experiences: true,
+                likes: true,
+                comments: true,
+                shares: true,
+            },
+            orderBy: {
+                id: 'desc',
+            },
+        });
+
+        return res.json({ status: 200, data: users });
+    } catch (error) {
+        console.error('Error searching users:', error);
+        return res.status(500).json({ status: 500, message: 'Internal Server Error' });
+    }
+};
+////////////////////////
+
+
 module.exports = {
     fetchUsers,
     updateUserInterests,
     getUserById,
-    deleteUser
+    deleteUser,
+    searchUsersByName
 };

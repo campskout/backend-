@@ -2,14 +2,17 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const { ROLES, inRole } = require('../security/Rolemiddleware');
-const { fetchUsers, updateUserInterests , getUserById,deleteUser} = require('../controllers/users.js');
+const { searchUsersByName,fetchUsers, updateUserInterests , getUserById,deleteUser} = require('../controllers/users.js');
 const { Login, Test, Admin,authenticateToken,changePassword } = require('../controllers/authController.js');
 const { validateRegister, registerUser } = require("../controllers/Authentication");
 
 router.get('/get', fetchUsers);
 router.post('/login', Login);
 router.post('/register', validateRegister(), registerUser);
-router.post('/updateInterests', updateUserInterests);
+
+router.post('/updateInterests', passport.authenticate('jwt', { session: false }), updateUserInterests);
+router.get('/search', searchUsersByName);
+
 
 
 // routes test
