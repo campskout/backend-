@@ -9,8 +9,10 @@ const { validateRegister, registerUser } = require("../controllers/Authenticatio
 router.get('/get', fetchUsers);
 router.post('/login', Login);
 router.post('/register', validateRegister(), registerUser);
+
 router.post('/updateInterests', passport.authenticate('jwt', { session: false }), updateUserInterests);
 router.get('/search', searchUsersByName);
+
 
 
 // routes test
