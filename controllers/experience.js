@@ -166,7 +166,7 @@ console.log(fields, files)
         const filePath = file.filepath; // Path to the temporary file
         const timestamp = Date.now(); // Optional: for unique file names
         const remoteFilePath = `uploads/images/${timestamp}-${file.originalFilename}`;
-
+        console.log( "filepath",filePath)
         // Upload the image using the bucket.upload() function
         await bucket.upload(filePath, { destination: remoteFilePath });
 
