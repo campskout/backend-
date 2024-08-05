@@ -41,8 +41,16 @@ const updateUserInterests = async (req, res) => {
     }
 
     try {
+        // Ensure userId is an integer
+        const userIdInt = parseInt(userId, 10);
+
+        
+        if (isNaN(userIdInt)) {
+            return res.status(400).json({ status: 400, message: 'Invalid user ID' });
+        }
+
         const updatedUser = await prisma.user.update({
-            where: { id: userId },
+            where: { id: userIdInt }, // Use integer ID here
             data: { interests: interests },
         });
 
@@ -52,6 +60,7 @@ const updateUserInterests = async (req, res) => {
         return res.status(500).json({ status: 500, message: 'Internal Server Error' });
     }
 };
+
 
 const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id, 10);
@@ -69,7 +78,7 @@ const getUserById = async (req, res) => {
                 posts: {
 
                     include: {
-                        user: true,
+                        user:true,
                         joinCampingPosts: {
                             include: {
                                 user: true, // Include the users who joined the camping post

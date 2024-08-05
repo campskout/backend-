@@ -259,11 +259,46 @@ const fetchCampings = async (req, res) => {
   });
   return res.json({ status: 200, data: campings });
 };
+//////////////////////////////////////////////////
+
+const fetchUserCampings = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+      // Fetch all camping posts created by the user
+      const userCampings = await prisma.campingPost.findMany({
+          where: {
+              organizerId: parseInt(userId, 10)
+          },
+          include: {
+              user: true, // Include user details
+              joinCampingPosts: {
+                  include: {
+                      user: true // Include users who joined the camping posts
+                  }
+              }
+          },
+          orderBy: {
+              id: "desc"
+          }
+      });
+
+      if (!userCampings) {
+          return res.status(404).json({ status: 404, message: 'No camping posts found for this user' });
+      }
+
+      return res.json({ status: 200, data: userCampings });
+  } catch (error) {
+      console.error('Error fetching user campings:', error);
+      return res.status(500).json({ status: 500, message: 'Internal Server Error' });
+  }
+};
 
 module.exports = {
-  fetchCampings,
-  createPost,
-  campingPostDetails,
-  onePostParticipants,
-  updateReview
+    fetchCampings,
+    createPost,
+    campingPostDetails,
+    onePostParticipants,
+    updateReview,
+    fetchUserCampings
 }

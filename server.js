@@ -11,7 +11,7 @@ const likeRoutes = require('./routes/like.js')
 
 const joiningRequestRoutes =require('../backend-/routes/acceptAndReject.js')
 const shareRoutes=require('./routes/share.js')
-
+const tipsRoutes = require('./routes/tips.js')
 const app = express()
 // * Middleware
 app.use(express.json())
@@ -32,6 +32,8 @@ app.use('/api/experienceTip',experienceRoutes)
 app.use('/api/comment', commentRoutes)
 app.use('/api/like', likeRoutes)
 app.use('/api/share', shareRoutes);
+app.use('/api/tips', tipsRoutes);
+
 const port = 5000
 
 app.listen(port,()=>console.log(`App listening on port ${port}!`))
