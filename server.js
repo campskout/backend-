@@ -10,6 +10,7 @@ const commentRoutes =require('./routes/comments.js')
 const likeRoutes = require('./routes/like.js')
 const joiningRequestRoutes =require('../backend-/routes/acceptAndReject.js')
 const shareRoutes=require('./routes/share.js')
+const invitationRoutes = require('./routes/invitations.js');
 const http = require('http');
 const { Server } = require('socket.io')
 const ChatRoutes = require('./routes/ChatRoutes.js');
@@ -45,9 +46,13 @@ app.use('/api/experienceTip',experienceRoutes)
 app.use('/api/comment', commentRoutes)
 app.use('/api/like', likeRoutes)
 app.use('/api/share', shareRoutes);
+
 app.use('/api/chat', authenticateToken, ChatRoutes);
 const userConnections = {}; 
 const userRooms = {}; 
+
+
+app.use('/api/invitations', invitationRoutes)
 
 
 io.on('connection', (socket) => {
