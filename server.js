@@ -12,16 +12,20 @@ const joiningRequestRoutes =require('../backend-/routes/acceptAndReject.js')
 const shareRoutes=require('./routes/share.js')
 const invitationRoutes = require('./routes/invitations.js');
 const http = require('http');
+const { Server } = require('socket.io')
+const ChatRoutes = require('./routes/ChatRoutes.js');
 const app = express();
+const authenticateToken = require('./controllers/authController.js').authenticateToken;
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 
 
 const server = http.createServer(app);
-const { Server } = require('socket.io');
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:5000/', 
-    methods: ['GET', 'POST'],
-  },
+const io = new Server(server,{
+    cors:{
+        origin:["http://localhost:8081","http://localhost:5000","http//192.168.10.4:8081","exp://192.168.10.4:8081"]
+    }
 });
 // * Middleware
 app.use(express.json())
@@ -42,32 +46,69 @@ app.use('/api/experienceTip',experienceRoutes)
 app.use('/api/comment', commentRoutes)
 app.use('/api/like', likeRoutes)
 app.use('/api/share', shareRoutes);
+
+app.use('/api/chat', authenticateToken, ChatRoutes);
+const userConnections = {}; 
+const userRooms = {}; 
+
+
 app.use('/api/invitations', invitationRoutes)
 
-io.on('connection', (socket) => {
-    console.log('A user connected');
 
-    // Handle incoming messages
-    socket.on('sendMessage', (message) => {
-        // Broadcast the message to the receiver
-        io.to(message.receiverId).emit('receiveMessage', message);
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    // Track the connected user's information
+    socket.on('setUser', (userId) => {
+        console.log(`User ${userId} connected with socket ID ${socket.id}`);
+        if (!userConnections[userId]) {
+            userConnections[userId] = [];
+        }
+        userConnections[userId].push(socket.id);
+        userRooms[userId] = userRooms[userId] || [];
     });
 
-    // Handle user joining a room
-    socket.on('joinRoom', (room) => {
-        socket.join(room);
-        console.log(`User joined room: ${room}`);
+    // Handle joining a room
+    socket.on('joinRoom', (conversationId) => {
+        console.log(`Socket ID ${socket.id} joined room: ${conversationId}`);
+        socket.join(conversationId);
+
+        // Track the room for the user
+        const userId = Object.keys(userConnections).find(id => userConnections[id].includes(socket.id));
+        if (userId) {
+            userRooms[userId].push(conversationId);
+        }
+    });
+
+    // Handle sending messages
+    socket.on('sendMessage', async (messageData) => {
+        const { senderId, receiverId, content, conversationId } = messageData;
+
+        try {
+            await prisma.chatMessage.create({
+                data: {
+                    content,
+                    senderId,
+                    receiverId,
+                    conversationId,
+                },
+            });
+
+            console.log(`Message from ${senderId} to ${receiverId} in room ${conversationId}: ${content}`);
+
+            // Emit the new message to the receiver
+            io.to(conversationId).emit('newMessage', messageData);
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
     });
 
     // Handle disconnection
     socket.on('disconnect', () => {
-        console.log('User disconnected');
+        console.log(`Socket ID ${socket.id} disconnected`);
     });
 });
 
-
-
-const port = 5000
-
-app.listen(port,()=>console.log(`App listening on port ${port}!`))
-
+  const PORT = process.env.PORT || 5000;
+  
+  server.listen(PORT, () => { console.log(`Server listening on port ${PORT}`);});
