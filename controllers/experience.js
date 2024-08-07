@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const admin = require('firebase-admin');
-const serviceAccount = require('../fire.json');
+const serviceAccount = require('../expFire.json');
 const formidable = require('formidable')
 const fs = require('fs');
 const path = require('path');

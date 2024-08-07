@@ -76,7 +76,7 @@ const getUserById = async (req, res) => {
                 posts: {
 
                     include: {
-                        user: true,
+                        user:true,
                         joinCampingPosts: {
                             include: {
                                 user: true, // Include the users who joined the camping post
@@ -92,41 +92,10 @@ const getUserById = async (req, res) => {
                         post: true,
                     }
                 },
-                experiences: {
-                    include: {
-                        user: true,
-                        likes: {
-                            include:{
-                                user:true
-                            }
-                        },
-                        comments: {
-                            include:{
-                                user:true
-                            }
-                        },
-                        shares: {
-                            include:{
-                                user:true
-                            }
-                        }
-                    }
-                },
-                likes: {
-                    include: {
-                        user: true
-                    }
-                },
-                comments: {
-                    include: {
-                        user: true
-                    }
-                },
-                shares: {
-                    include: {
-                        user: true
-                    }
-                },
+                experiences: true,
+                likes: true,
+                comments: true,
+                shares: true,
             },
 
         });
@@ -176,8 +145,8 @@ const deleteUser = async (req, res) => {
 };
 
 
-/////////////////////////////////////
-const searchUsersByName = async (req, res) => {
+  /////////////////////////////////////
+  const searchUsersByName = async (req, res) => {
     const { name } = req.query;
 
     if (!name) {
@@ -185,12 +154,12 @@ const searchUsersByName = async (req, res) => {
     }
 
     try {
-
+        
         const users = await prisma.user.findMany({
             where: {
                 name: {
                     contains: name,
-                    mode: 'insensitive',
+                    mode: 'insensitive', 
                 },
             },
             include: {
