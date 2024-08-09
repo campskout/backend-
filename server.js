@@ -68,37 +68,78 @@ io.on('connection', (socket) => {
 
   socket.on('camperJoined', async (campOfferId, userId) => {
     try {
-      // Récupérer les détails de l'offre de camping
+      // Retrieve the camp offer details
       const offer = await prisma.campingPost.findUnique({
         where: { id: campOfferId },
         select: { title: true, organizerId: true },
       });
   
-      // Récupérer les détails de l'utilisateur (campeur)
+      // Retrieve the camper details
       const camper = await prisma.user.findUnique({
         where: { id: userId },
         select: { name: true },
       });
   
-      // Vérifier si l'offre et le campeur existent
+      // Check if the offer and camper exist
       if (!offer || !camper) {
         console.log(`Camp offer with ID ${campOfferId} or camper with ID ${userId} not found.`);
         return;
       }
   
-      // Créer le message avec le nom du campeur et le titre de l'offre
-      const notificationMessage = `  ${camper.name} has joined your camp offer titled ${offer.title}`;
-   console.log(`User (Name: ${camper.name}) has joined your camp offer titled "${offer.title}" (Offer ID: ${campOfferId})`)
-      // Envoyer la notification à l'organisateur
+      // Create the notification message
+      const notificationMessage = `${camper.name} has joined your camp offer titled ${offer.title}`;
+      console.log(`User (Name: ${camper.name}) has joined your camp offer titled "${offer.title}" (Offer ID: ${campOfferId})`);
+  
+      // Send the notification to the organizer
       io.to(offer.organizerId.toString()).emit('notification', notificationMessage);
       console.log(notificationMessage);
+  
+      // Check if a record already exists
+      const existingNotification = await prisma.joinCampingPost.findUnique({
+        where: {
+          userId_postId: {
+            userId: userId,
+            postId: campOfferId,
+          },
+        },
+      });
+  
+      if (existingNotification) {
+        // Update the existing record
+        await prisma.joinCampingPost.update({
+          where: {
+            userId_postId: {
+              userId: userId,
+              postId: campOfferId,
+            },
+          },
+          data: {
+            notification: notificationMessage,
+            status: 'PENDING', // Update status or any other fields as needed
+          },
+        });
+      } else {
+        // Create a new record if not found
+        await prisma.joinCampingPost.create({
+          data: {
+            userId: userId,
+            postId: campOfferId,
+            rating: 0, // Default rating or use actual rating if available
+            reviews: '', // Default reviews or use actual reviews if available
+            favorite: 'No', // Default favorite status
+            notification: notificationMessage,
+            status: 'PENDING', // Default status or use actual status if available
+          },
+        });
+      }
   
     } catch (error) {
       console.error('Error processing camperJoined event:', error);
     }
   });
   
-  
+
+
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
