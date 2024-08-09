@@ -31,7 +31,7 @@ const io = new Server(server, {
   }
 });
 
-// Room management
+// Room and Connection management
 const userRooms = {}; // { userId: [roomIds] }
 const userConnections = {}; // { userId: [socketIds] }
 
@@ -40,9 +40,9 @@ io.on('connection', (socket) => {
   console.log('A user connected', socket.id);
 
   socket.on('register', (userId) => {
-    socket.join(userId);
+    socket.join(userId.toString());
     console.log(`User ${userId} joined room`);
-    
+
     if (!userConnections[userId]) {
       userConnections[userId] = [];
     }
@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', (message) => {
-    io.to(message.receiverId).emit('receiveMessage', message);
+    io.to(message.receiverId.toString()).emit('receiveMessage', message);
   });
 
   socket.on('joinRoom', (room) => {
@@ -68,24 +68,52 @@ io.on('connection', (socket) => {
 
   socket.on('camperJoined', async (campOfferId, userId) => {
     try {
+      // Récupérer les détails de l'offre de camping
       const offer = await prisma.campingPost.findUnique({
         where: { id: campOfferId },
-        select: { organizerId: true },
+        select: { title: true, organizerId: true },
       });
-
-      if (offer && offer.organizerId) {
-        io.to(offer.organizerId.toString()).emit('notification', `A camper (User ID: ${userId}) has joined your camp offer ${campOfferId}`);
-      } else {
-        console.log(`Camp offer with ID ${campOfferId} or organizer not found.`);
+  
+      // Récupérer les détails de l'utilisateur (campeur)
+      const camper = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+      });
+  
+      // Vérifier si l'offre et le campeur existent
+      if (!offer || !camper) {
+        console.log(`Camp offer with ID ${campOfferId} or camper with ID ${userId} not found.`);
+        return;
       }
+  
+      // Créer le message avec le nom du campeur et le titre de l'offre
+      const notificationMessage = `  ${camper.name} has joined your camp offer titled ${offer.title}`;
+   console.log(`User (Name: ${camper.name}) has joined your camp offer titled "${offer.title}" (Offer ID: ${campOfferId})`)
+      // Envoyer la notification à l'organisateur
+      io.to(offer.organizerId.toString()).emit('notification', notificationMessage);
+      console.log(notificationMessage);
+  
     } catch (error) {
       console.error('Error processing camperJoined event:', error);
     }
   });
+  
+  
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
-    // Clean up userConnections and userRooms if necessary
+
+    for (const userId in userConnections) {
+      const index = userConnections[userId].indexOf(socket.id);
+      if (index !== -1) {
+        userConnections[userId].splice(index, 1);
+        if (userConnections[userId].length === 0) {
+          delete userConnections[userId];
+          delete userRooms[userId];
+        }
+        break;
+      }
+    }
   });
 
   socket.on('error', (err) => {
@@ -131,6 +159,7 @@ const port = 5000;
 server.listen(port, () => {
   console.log(`App listening on port ${port}!`);
 });
+
 
 
 
