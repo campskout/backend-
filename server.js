@@ -13,6 +13,7 @@ const likeRoutes = require('./routes/like.js');
 const joiningRequestRoutes = require('../backend-/routes/acceptAndReject.js');
 const shareRoutes = require('./routes/share.js');
 const prisma = require('./database/prisma.js');
+const dashboardRoutes= require('./routes/dashboard.js')
 
 // Initialize Express app
 const app = express();
@@ -185,6 +186,7 @@ app.use('/api/experienceTip', experienceRoutes);
 app.use('/api/comment', commentRoutes);
 app.use('/api/like', likeRoutes);
 app.use('/api/share', shareRoutes);
+app.use('/api/dashboard',dashboardRoutes)
 
 // Test route to verify Socket.IO initialization
 app.get('/test', (req, res) => {
