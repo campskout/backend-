@@ -38,7 +38,7 @@ const chartOne = async(req,res) =>{
       } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
       }
- };
+};
 
 const chartTwo = async(req,res)=>{
     try {
@@ -60,7 +60,7 @@ const chartTwo = async(req,res)=>{
       } catch (error) {
         res.status(500).json({ error: 'Failed to fetch data' });
       }
- };
+};
 
 const chartThree = async(req,res)=>{
     const campingPosts = await prisma.campingPost.groupBy({
@@ -77,7 +77,7 @@ const chartThree = async(req,res)=>{
       }));
     
       res.json(data);
- };
+};
 
 const EndpointTofetchCampingPostLocations = async(req,res)=>{
     try {
