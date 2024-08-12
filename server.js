@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const commentRoutes =require('./routes/comments.js')
 const likeRoutes = require('./routes/like.js')
-
+const updateRoutes=require('./routes/updateUser.js')
 const joiningRequestRoutes =require('../backend-/routes/acceptAndReject.js')
 const shareRoutes=require('./routes/share.js')
 
@@ -26,6 +26,9 @@ require('./security/passport')(passport)
 app.use('/api/users',usersRoutes)
 app.use('/api/camps',campsRoutes)
 app.use('/api/joinPosts',joinPostRoutes)
+
+
+app.use('/api/user',updateRoutes)
 
 app.use('/api/acceptAndReject', joiningRequestRoutes)
 app.use('/api/experienceTip',experienceRoutes)
