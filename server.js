@@ -28,6 +28,7 @@ app.use('/api/camps',campsRoutes)
 app.use('/api/joinPosts',joinPostRoutes)
 
 
+
 app.use('/api/user',updateRoutes)
 
 app.use('/api/acceptAndReject', joiningRequestRoutes)
