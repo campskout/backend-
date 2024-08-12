@@ -10,6 +10,7 @@ const commentRoutes = require('./routes/comments.js');
 const likeRoutes = require('./routes/like.js');
 const joiningRequestRoutes = require('./routes/acceptAndReject.js');
 const shareRoutes = require('./routes/share.js');
+const updateRoutes=require('./routes/updateUser.js')
 const invitationRoutes = require('./routes/invitations.js');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -34,16 +35,23 @@ app.use(cors());
 app.use(passport.initialize());
 require('./security/passport')(passport);
 
-app.use('/api/users', usersRoutes);
-app.use('/api/camps', campsRoutes);
-app.use('/api/joinPosts', joinPostRoutes);
-app.use('/api/acceptAndReject', joiningRequestRoutes);
-app.use('/api/experienceTip', experienceRoutes);
-app.use('/api/comment', commentRoutes);
-app.use('/api/like', likeRoutes);
+app.use('/api/users',usersRoutes)
+app.use('/api/camps',campsRoutes)
+app.use('/api/joinPosts',joinPostRoutes)
+
+
+
+app.use('/api/user',updateRoutes)
+
+app.use('/api/acceptAndReject', joiningRequestRoutes)
+app.use('/api/experienceTip',experienceRoutes)
+app.use('/api/comment', commentRoutes)
+app.use('/api/like', likeRoutes)
 app.use('/api/share', shareRoutes);
 app.use('/api/chat', authenticateToken, ChatRoutes);
 app.use('/api/invitations', invitationRoutes);
+pp.use('/api/user',updateRoutes)
+
 
 const userConnections = {}; 
 const userRooms = {}; 

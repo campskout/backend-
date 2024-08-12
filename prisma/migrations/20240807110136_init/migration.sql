@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "imagesProfile" SET NOT NULL,
+ALTER COLUMN "imagesProfile" SET DATA TYPE TEXT,
+ALTER COLUMN "dateOfBirth" SET DATA TYPE DATE;

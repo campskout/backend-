@@ -47,7 +47,7 @@ const registerUser = async (req, res) => {
         password: hashedPassword,
         address: '',
         interests: ["Hiking", "Kayaking", "Fishing", "Climbing", "Hiking", "Others"],
-        imagesProfile: [],
+        imagesProfile:'',
         gender: 'Men',
         bio: '',
         phoneNumber: '',

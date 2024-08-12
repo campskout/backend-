@@ -19,27 +19,27 @@ enum Gender {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  password      String
-  name          String
-  address       String
-  interests    String[] @default(["Hiking", "Kayaking", "Fishing","Climbing","Hiking","Others"])
-  imagesProfile String[]
-  gender        Gender
-  bio           String
-  phoneNumber   String
-  dateOfBirth   DateTime
-  createdAt     DateTime @default(now())
-  posts         CampingPost[] @relation("UserPosts")
+  id               Int               @id @default(autoincrement())
+  email            String            @unique
+  password         String
+  name             String
+  address          String
+  interests        String[]          @default(["Hiking", "Kayaking", "Fishing", "Climbing", "Hiking", "Others"])
+  imagesProfile    String
+  gender           Gender
+  bio              String
+  phoneNumber      String
+  dateOfBirth      DateTime          @db.Date
+  createdAt        DateTime          @default(now())
+  posts            CampingPost[]     @relation("UserPosts")
   joinCampingPosts JoinCampingPost[] @relation("UserJoinCampingPosts")
-  experiences     ExperiencesTips[]  @relation("UserExperiences")
-  likes           Like[] @relation("UserLikes")
-  comments        Comments[] @relation("UserComments")
-  shares          Share[] @relation("UserShares")
+  experiences      ExperiencesTips[] @relation("UserExperiences")
+  likes            Like[]            @relation("UserLikes")
+  comments         Comments[]        @relation("UserComments")
+  shares           Share[]           @relation("UserShares")
 
-  sentInvitations Invitation[]      @relation("SentInvitations")
-  receivedInvitations Invitation[]  @relation("ReceivedInvitations")
+  sentInvitations     Invitation[] @relation("SentInvitations")
+  receivedInvitations Invitation[] @relation("ReceivedInvitations")        
 
   sentMessages         ChatMessage[] @relation("SentMessages")
   receivedMessages     ChatMessage[] @relation("ReceivedMessages")
@@ -47,21 +47,21 @@ model User {
 }
 
 model CampingPost {
-  id           Int @id @default(autoincrement())
-  user          User @relation("UserPosts", fields: [organizerId], references: [id], onDelete: Cascade)
-  title        String
-  description  String
-  location     String
-  startDate    DateTime
-  endDate      DateTime
-  equipment    String[] @default([])
-  places       Int
-  ageCategory  AgeCategory
-  images       String[] @default([])
-  organizerId  Int
+  id               Int               @id @default(autoincrement())
+  user             User              @relation("UserPosts", fields: [organizerId], references: [id], onDelete: Cascade)
+  title            String
+  description      String
+  location         String
+  startDate        DateTime
+  endDate          DateTime
+  equipment        String[]          @default([])
+  places           Int
+  ageCategory      AgeCategory
+  images           String[]          @default([])
+  organizerId      Int
   joinCampingPosts JoinCampingPost[] @relation("CampingPostJoinCampingPosts")
-  category     CategoryCamping
-  status       StatusCampingPost
+  category         CategoryCamping
+  status           StatusCampingPost
 }
 
 enum AgeCategory {
@@ -70,63 +70,63 @@ enum AgeCategory {
   KIDS
 }
 
-enum StatusCampingPost{
+enum StatusCampingPost {
   PENDING
   InProgress
   Completed
   Canceled
-  Delegated  
+  Delegated
 }
 
 model JoinCampingPost {
-  userId      Int
-  postId      Int
-  user        User        @relation("UserJoinCampingPosts", fields: [userId], references: [id])
-  post        CampingPost @relation("CampingPostJoinCampingPosts", fields: [postId], references: [id])
-  rating      Int
-  reviews     String
-  favorite    String
+  userId       Int
+  postId       Int
+  user         User          @relation("UserJoinCampingPosts", fields: [userId], references: [id])
+  post         CampingPost   @relation("CampingPostJoinCampingPosts", fields: [postId], references: [id])
+  rating       Int
+  reviews      String
+  favorite     String
   notification String
+  status       JoiningStatus
+
   @@id([userId, postId])
-  status    JoiningStatus
 }
 
 enum JoiningStatus {
-  PENDING 
+  PENDING
   ACCEPTED
   REJECTED
 }
 
 enum CategoryCamping {
- Hiking
- Kayaking
- Fishing
- Climbing
- Hitchhiking
+  Hiking
+  Kayaking
+  Fishing
+  Climbing
+  Hitchhiking
 }
 
 model ExperiencesTips {
-  id           Int @id @default(autoincrement())
-  title        String
-  content      String
-  imagesUrl    String[]
-  location     String
-  category        CategoryExperiences
-  filterCategory  FiltreCategory
-  likeCounter   Int
-  shareCounter  Int
-  user          User @relation("UserExperiences", fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int
-  createdAt     DateTime @default(now())
-  likes         Like[] @relation("LikeExperiences")
-  comments      Comments[] @relation("CommentsExperiences")
-  shares        Share[]  @relation("ShareExperiences")
-  
+  id             Int                 @id @default(autoincrement())
+  title          String
+  content        String
+  imagesUrl      String[]
+  location       String
+  category       CategoryExperiences
+  filterCategory FiltreCategory
+  likeCounter    Int
+  shareCounter   Int
+  user           User                @relation("UserExperiences", fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int
+  createdAt      DateTime            @default(now())
+  likes          Like[]              @relation("LikeExperiences")
+  comments       Comments[]          @relation("CommentsExperiences")
+  shares         Share[]             @relation("ShareExperiences")
 }
 
 enum CategoryExperiences {
- Experiences
- Tips
+  Experiences
+  Tips
 }
 
 enum FiltreCategory {
@@ -140,46 +140,46 @@ enum FiltreCategory {
 }
 
 model Like {
-  id           Int @id @default(autoincrement())
-  experience    ExperiencesTips  @relation("LikeExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
-  experienceId        Int
-  user          User @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int
+  id           Int             @id @default(autoincrement())
+  experience   ExperiencesTips @relation("LikeExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
+  experienceId Int
+  user         User            @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
 }
 
 model Comments {
-  id           Int @id @default(autoincrement())
+  id           Int             @id @default(autoincrement())
   content      String
-  experience    ExperiencesTips @relation("CommentsExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
-  experienceId  Int
-  user          User @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int
+  experience   ExperiencesTips @relation("CommentsExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
+  experienceId Int
+  user         User            @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
 }
 
 model Share {
-  id           Int @id @default(autoincrement())
-  experience    ExperiencesTips @relation("ShareExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
-  experienceId   Int
-  user          User @relation("UserShares", fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int
+  id           Int             @id @default(autoincrement())
+  experience   ExperiencesTips @relation("ShareExperiences", fields: [experienceId], references: [id], onDelete: Cascade)
+  experienceId Int
+  user         User            @relation("UserShares", fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
 }
 
 model Admin {
-  id           Int @id @default(autoincrement())
-  email         String   @unique
-  password      String
-  name          String
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  name     String
 }
 
 model Invitation {
-  id           Int      @id @default(autoincrement())
-  senderId     Int
-  receiverId   Int
-  status       StatusInvitation   
-  createdAt    DateTime @default(now())
+  id         Int              @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  status     StatusInvitation
+  createdAt  DateTime         @default(now())
 
-  sender       User     @relation("SentInvitations", fields: [senderId], references: [id])
-  receiver     User     @relation("ReceivedInvitations", fields: [receiverId], references: [id])
+  sender   User @relation("SentInvitations", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedInvitations", fields: [receiverId], references: [id])
 }
 
 enum StatusInvitation {
