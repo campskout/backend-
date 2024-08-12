@@ -1,5 +1,6 @@
 const prisma = require('../database/prisma.js')
 
+const { notifyUser } = require('../notificationService.js'); // Import notifyUser
 
 const fetchJoinPosts = async (req, res) => {
     const users = await prisma.joinCampingPost.findMany({
@@ -15,7 +16,7 @@ const createJoinPostCamping = async (req, res) => {
     const { userId, postId, rating, reviews, favorite, notification, status } = req.body;
 
     try {
-        // Check if the user and post exist
+        // Your logic here
         const user = await prisma.user.findUnique({ where: { id: userId } });
         const post = await prisma.campingPost.findUnique({ where: { id: postId } });
 
@@ -27,12 +28,10 @@ const createJoinPostCamping = async (req, res) => {
             return res.status(404).json({ status: 404, message: 'Post not found' });
         }
 
-        // Check if there are available places if status is 'ACCEPTED'
         if (status === 'ACCEPTED' && post.places <= 0) {
             return res.status(400).json({ status: 400, message: 'No available places left' });
         }
 
-        // Check if the JoinCampingPost entry already exists
         const existingJoinCampingPost = await prisma.joinCampingPost.findUnique({
             where: {
                 userId_postId: {
@@ -46,7 +45,6 @@ const createJoinPostCamping = async (req, res) => {
             return res.status(409).json({ status: 409, message: 'JoinCampingPost entry already exists' });
         }
 
-        // Create the JoinCampingPost entry
         const newJoinCampingPost = await prisma.joinCampingPost.create({
             data: {
                 userId,
@@ -59,7 +57,6 @@ const createJoinPostCamping = async (req, res) => {
             }
         });
 
-        // Update the post's available places based on the status
         if (status === 'ACCEPTED') {
             const updatedPost = await prisma.campingPost.update({
                 where: { id: postId },
@@ -134,7 +131,7 @@ const fetchOnePostJoin = async (req, res) => {
                 userId_postId: {
                     userId: parseInt(userId, 10),
                     postId: parseInt(postId, 10),
-                    
+
                 }
             },
             include: {
@@ -154,9 +151,36 @@ const fetchOnePostJoin = async (req, res) => {
     }
 };
 
+async function getOfferCreatorId(campOfferId) {
+    try {
+      // Fetch the camp offer details from the database
+      const offer = await prisma.campingPost.findUnique({
+        where: {
+          id: campOfferId,
+        },
+        select: {
+          organizerId: true,
+        },
+      });
+  
+      // Check if the offer exists and return the organizer ID
+      if (offer) {
+        return offer.organizerId;
+      } else {
+        console.log(`Camp offer with ID ${campOfferId} not found.`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching offer creator ID:', error);
+      throw new Error('Error fetching offer creator ID');
+    }
+  }
+
+
 module.exports = {
     fetchJoinPosts,
     createJoinPostCamping,
     cancelJoinPostCamping,
-    fetchOnePostJoin
+    fetchOnePostJoin,
+    getOfferCreatorId
 }
