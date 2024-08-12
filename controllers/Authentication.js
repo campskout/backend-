@@ -47,7 +47,7 @@ const registerUser = async (req, res) => {
         password: hashedPassword,
         address: '',
         interests: ["Hiking", "Kayaking", "Fishing", "Climbing", "Hiking", "Others"],
-        imagesProfile: [],
+        imagesProfile:'',
         gender: 'Men',
         bio: '',
         phoneNumber: '',
@@ -57,6 +57,7 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({ message: 'User registered successfully', user });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: 'Something went wrong' });
   }
 }
