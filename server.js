@@ -12,6 +12,7 @@ const joiningRequestRoutes = require('./routes/acceptAndReject.js');
 const shareRoutes = require('./routes/share.js');
 const updateRoutes=require('./routes/updateUser.js')
 const invitationRoutes = require('./routes/invitations.js');
+const productRoutes = require('./routes/product.js'); 
 const http = require('http');
 const { Server } = require('socket.io');
 const ChatRoutes = require('./routes/ChatRoutes.js');
@@ -50,7 +51,8 @@ app.use('/api/like', likeRoutes)
 app.use('/api/share', shareRoutes);
 app.use('/api/chat', authenticateToken, ChatRoutes);
 app.use('/api/invitations', invitationRoutes);
-pp.use('/api/user',updateRoutes)
+app.use('/api/user',updateRoutes)
+app.use('/api/product', productRoutes);
 
 
 const userConnections = {}; 

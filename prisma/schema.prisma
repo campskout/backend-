@@ -44,6 +44,8 @@ model User {
   sentMessages         ChatMessage[] @relation("SentMessages")
   receivedMessages     ChatMessage[] @relation("ReceivedMessages")
   conversations       Conversation[] @relation("ConversationParticipants")
+
+   products          Product[]         @relation("UserProducts")
 }
 
 model CampingPost {
@@ -206,4 +208,29 @@ model Conversation {
   participants User[]   @relation("ConversationParticipants")
   messages  ChatMessage[]
   createdAt DateTime    @default(now())
+}
+
+
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  category    ProductCategory
+  imageUrl    String[]
+  user        User      @relation("UserProducts", fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+
+
+enum ProductCategory {
+  hikingEquipment
+  clothing
+  cookingSupplies
+  safetyItems
+  personalCareEssentials
 }
