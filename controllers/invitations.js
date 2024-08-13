@@ -6,9 +6,17 @@ const sendInvitation = async (req, res) => {
   try {
     const { senderId, receiverId } = req.body;
 
+    // Convert senderId and receiverId to integers
+    const senderIdInt = parseInt(senderId, 10);
+    const receiverIdInt = parseInt(receiverId, 10);
+
+    if (isNaN(senderIdInt) || isNaN(receiverIdInt)) {
+      return res.status(400).json({ error: 'Invalid sender or receiver ID' });
+    }
+
     // Check if the sender exists
     const sender = await prisma.user.findUnique({
-      where: { id: senderId },
+      where: { id: senderIdInt },
     });
 
     if (!sender) {
@@ -17,7 +25,7 @@ const sendInvitation = async (req, res) => {
 
     // Check if the receiver exists
     const receiver = await prisma.user.findUnique({
-      where: { id: receiverId },
+      where: { id: receiverIdInt },
     });
 
     if (!receiver) {
@@ -26,8 +34,8 @@ const sendInvitation = async (req, res) => {
 
     const newInvitation = await prisma.invitation.create({
       data: {
-        senderId,
-        receiverId,
+        senderId: senderIdInt,
+        receiverId: receiverIdInt,
         status: 'Pending',
       },
       include: {
@@ -106,9 +114,43 @@ const getReceivedInvitations = async (req, res) => {
   }
 };
 
+// Get invitation status between two users
+// Get invitation status between two users
+const getInvitationStatus = async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.query;
+
+    // Convert senderId and receiverId to integers
+    const senderIdInt = parseInt(senderId, 10);
+    const receiverIdInt = parseInt(receiverId, 10);
+
+    if (isNaN(senderIdInt) || isNaN(receiverIdInt)) {
+      return res.status(400).json({ error: 'Invalid sender or receiver ID' });
+    }
+
+    const invitation = await prisma.invitation.findFirst({
+      where: {
+        senderId: senderIdInt,
+        receiverId: receiverIdInt,
+      },
+    });
+
+    if (!invitation) {
+      return res.status(200).json({ status: 'Not Invited' });
+    }
+
+    return res.status(200).json({ status: invitation.status });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong while fetching the invitation status.' });
+  }
+};
+
+
 module.exports = {
   sendInvitation,
   respondToInvitation,
   getSentInvitations,
   getReceivedInvitations,
+  getInvitationStatus, // Export the new endpoint
 };
