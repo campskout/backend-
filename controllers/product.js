@@ -1,4 +1,3 @@
-// controllers/product.js
 const prisma = require('../database/prisma.js');
 
 // Create a new product
@@ -39,6 +38,7 @@ const getProducts = async (req, res) => {
 };
 
 // Get a product by ID
+// Get a product by ID
 const getProductById = async (req, res) => {
     const productId = parseInt(req.params.id, 10);
 
@@ -49,6 +49,9 @@ const getProductById = async (req, res) => {
     try {
         const product = await prisma.product.findUnique({
             where: { id: productId },
+            include: {
+                user: true 
+            }
         });
 
         if (!product) {
