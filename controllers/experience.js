@@ -112,8 +112,34 @@ const getAllExperiences = async (req, res) => {
   }
 };
 
+
+//delete ExperiencesTips
+const deleteExperience = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    if (isNaN(parseInt(id, 10))) {
+      return res.status(400).json({ error: 'Invalid experience ID' });
+    }
+
+    await prisma.experiencesTips.delete({
+      where: { id: parseInt(id, 10) },
+    });
+
+    res.status(200).json({ message: `Experience with ID ${id} has been deleted successfully.` });
+  } catch (error) {
+    console.error('Error deleting experience:', error);
+    res.status(500).json({ error: 'Failed to delete experience' });
+  }
+}
+
+
+
+
 module.exports = {
   createExperience,
   getExperienceById,
-  getAllExperiences
+  getAllExperiences,
+  deleteExperience
+ 
 };
