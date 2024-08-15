@@ -45,7 +45,7 @@ const emailVerifications = async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    res.send('Verification email sent');
+    res.send({ message: 'Verification email sent', token });
   } catch (error) {
     res.status(500).send('Error sending email');
   }
