@@ -55,32 +55,39 @@ const emailVerifications = async (req, res) => {
 const verifyEmail = async (req, res) => {
   const { token } = req.query;
 
-  const user = await prisma.user.findUnique({
-    where: { verificationToken: token },
+  // Check if the token is valid
+  const user = await prisma.user.findFirst({
+    where: {
+      verificationToken: token,
+      tokenExpiry: {
+        gt: new Date() // Check if token has not expired
+      }
+    }
   });
 
-  if (!user || new Date() > user.tokenExpiry) {
-    return res.status(400).send('Token is invalid or expired');
+  if (!user) {
+    return res.status(400).send('Invalid or expired token');
   }
 
+  // Mark the user as verified
   await prisma.user.update({
-    where: { email: user.email },
-    data: { isVerified: true, verificationToken: null, tokenExpiry: null },
+    where: { id: user.id },
+    data: {
+      isVerified : true,
+      verificationToken: null,
+      tokenExpiry: null,
+    },
   });
 
-  res.send('Email successfully verified');
-}
+  res.send('Email verified successfully');
+};
+
 
 
 module.exports ={
   verifyEmail,
   emailVerifications
 }
-
-
-
-
-
 
 /*var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
