@@ -27,18 +27,76 @@ const fetchDataDashboard = async (req, res) => {
     }
 };
 
-const chartOne = async(req,res) =>{
-    try {
-        const userStats = await prisma.user.count();
-        const campingPostsCount = await prisma.campingPost.count();
-        
-        // You can fetch other statistics or data points here
-        
-        res.status(200).json({ userStats, campingPostsCount });
-      } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
+const chartOne1 = async (req, res) => {
+  try {
+    // Fetch the total number of users
+    const userStats = await prisma.user.count();
+    
+    // Fetch the total number of camping posts
+    const campingPostsCount = await prisma.campingPost.count();
+    
+    // Fetch the total number of experience tips
+    const experiencesTipsCount = await prisma.experiencesTips.count();
+
+    // You can fetch other statistics or data points here
+
+    // Respond with the collected statistics
+    res.status(200).json({
+      userStats,
+      campingPostsCount,
+      experiencesTipsCount,
+    });
+  } catch (error) {
+    // Handle potential errors
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
+
+const chartOne = async (req, res) => {
+  try {
+    // Fetch daily registration counts
+    const dailyRegistrations = await prisma.user.groupBy({
+      by: ['createdAt'], // Group by the createdAt field
+      _count: {
+        id: true, // Count the number of users
+      },
+      orderBy: {
+        createdAt: 'asc', // Order by date ascending
+      },
+    });
+
+    // Aggregate the data to avoid duplicate days
+    const aggregatedData = dailyRegistrations.reduce((acc, item) => {
+      const date = item.createdAt.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+      if (acc[date]) {
+        acc[date] += item._count.id;
+      } else {
+        acc[date] = item._count.id;
+      }
+      return acc;
+    }, {});
+
+    // Convert aggregated data to the desired format
+    const formattedData = Object.keys(aggregatedData).map(date => ({
+      day: date,
+      count: aggregatedData[date],
+    }));
+
+    // Respond with the collected statistics
+    res.status(200).json({
+      dailyRegistrations: formattedData,
+    });
+  } catch (error) {
+    // Handle potential errors
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+
+
 
 const chartTwo = async(req,res)=>{
     try {

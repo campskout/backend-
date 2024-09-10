@@ -35,7 +35,9 @@ const registerUser = async (req, res) => {
 
 
   /// Register User
-  const { name, email, password } = req.body;
+  const { name, email, password ,
+    address,interests,imagesProfile,gender,bio,phoneNumber,
+    dateOfBirth,verificationToken,tokenExpiry,isVerified} = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -45,13 +47,16 @@ const registerUser = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        address: '',
-        interests: ["Hiking", "Kayaking", "Fishing", "Climbing", "Hiking", "Others"],
-        imagesProfile: [],
-        gender: 'Men',
-        bio: '',
-        phoneNumber: '',
-        dateOfBirth: new Date(0), 
+        address,
+        interests,
+        imagesProfile,
+        gender,
+        bio,
+        phoneNumber,
+        dateOfBirth, 
+        verificationToken,
+        tokenExpiry,
+        isVerified
       },
     });
 
