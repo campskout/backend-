@@ -41,9 +41,28 @@ const getCommentsForExperience = async (req, res) => {
   }
 };
 
+//delete Comments
+const deleteComments = async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    if (isNaN(parseInt(id, 10))) {
+      return res.status(400).json({ error: 'Invalid comment ID' });
+    }
+
+    await prisma.comments.delete({
+      where: { id: parseInt(id, 10) },
+    });
+
+    res.status(200).json({ message: `Comment with ID ${id} has been deleted successfully.` });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    res.status(500).json({ error: 'Failed to delete comment' });
+  }
+}
 
 module.exports = {
   createComment,
-  getCommentsForExperience
+  getCommentsForExperience,
+  deleteComments
 };

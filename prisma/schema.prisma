@@ -43,6 +43,10 @@ model User {
 
   sentMessages         ChatMessage[] @relation("SentMessages")
   receivedMessages     ChatMessage[] @relation("ReceivedMessages")
+
+  verificationToken String?  
+  tokenExpiry       DateTime? 
+  isVerified        Boolean   @default(false) 
 }
 
 model CampingPost {
